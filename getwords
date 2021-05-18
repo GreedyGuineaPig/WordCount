@@ -1,0 +1,49 @@
+#!/usr/bin/perl
+
+use strict;
+
+my $auth;
+my %dict;
+my %authdict;
+
+if(!@ARGV) {
+    print("Must provide input text file.\n");
+    exit(1);
+}
+
+my $flag = 0;
+my $book = $ARGV[0];
+open(FILE, "$book") or die "Could not open file $book for reading: $!\n";
+while(my $line = <FILE>) {
+    chomp($line);
+    if($line =~ /Author: (?<author>.+)/) { $auth = uc($+{author}); }
+    if($line =~ /START OF THIS PROJECT GUTENBERG EBOOK/ or $line =~ /START OF THE PROJECT GUTENBERG EBOOK/) { $flag = 1; }
+    if($line =~ /END OF THIS PROJECT GUTENBERG EBOOK/ or $line =~ /END OF THE PROJECT GUTENBERG EBOOK/) { last; }
+    if(!$flag) { next; }
+    my @words = split(/\s+/, $line);
+    foreach my $w (@words) {
+        $w =~ s/^[[:punct:]]+|[[:punct:]]+$//g;
+        $w = uc($w);
+        if($w =~ m/^[A-Z]+(-[A-Z]+)?('[A-Z]+)?$/) {
+            if(exists $dict{$w}) { $dict{$w}++; }
+            else { $dict{$w} = 1; }
+            if(exists $authdict{$auth}{$w}) { $authdict{$auth}{$w}++; }
+            else { $authdict{$auth}{$w} = 1; }
+        }
+    }
+}
+close(FILE);
+
+print(STDOUT "TOTALWORDS\n");
+foreach my $d (sort {$dict{$a} <=> $dict{$b}} keys(%dict)) {
+    print(STDOUT "$d: $dict{$d}\n");
+}
+
+foreach my $author (keys(%authdict)) {
+    print(STDOUT "$author\n");
+    foreach my $w (sort {$authdict{$author}{$a} <=> $authdict{$author}{$b}} keys(%{$authdict{$author}})) {
+        print(STDOUT "$w: $authdict{$author}{$w}\n");
+    }
+}
+
+exit(0);

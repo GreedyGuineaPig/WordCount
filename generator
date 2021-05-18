@@ -1,0 +1,17 @@
+#!/usr/bin/env python2
+import os
+
+def generator():
+	files = [f for f in os.listdir('./books')]
+	n = 10
+	results = [files[i:i + n] for i in range(0, len(files), n)]
+	acc = 1
+	with open("rule.txt", 'w') as rule:
+		for result in results:
+			print(result)
+			out = str(acc) + "out.txt"
+			inputs = str(result[0:10]).replace("[", "").replace("]","").replace(",", " ")
+			rule.write("{0}: {1}\n\tpython combine {1} > {0}\n".format(out, inputs))
+			acc += 1
+
+generator()

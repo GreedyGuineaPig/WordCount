@@ -2,7 +2,7 @@
 import sys
 
 
-def main():
+def combine():
     args = sys.argv
     if len(args) == 1:
         exit()
@@ -13,5 +13,4 @@ def main():
     with open(args[-1], 'w') as f:
         f.write(prevContents)
 
-
-main()
+combine()
