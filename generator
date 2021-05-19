@@ -7,11 +7,22 @@ def generator():
 	results = [files[i:i + n] for i in range(0, len(files), n)]
 	acc = 1
 	with open("rule.txt", 'w') as rule:
+		# combine (our merge) rule
 		for result in results:
-			print(result)
 			out = str(acc) + "out.txt"
-			inputs = str(result[0:10]).replace("[", "").replace("]","").replace(",", " ")
+			for book in result:
+				book = "./books/" + book
+				print("This is book: " + book)
+			print(result)
+			inputs =  str(result[0:10]).replace("[", "").replace("]","").replace(",", " ").replace("'", "")
 			rule.write("{0}: {1}\n\tpython combine {1} > {0}\n".format(out, inputs))
 			acc += 1
-
+		# getwords rule
+		n = 1
+		results = [files[i:i + n] for i in range(0, len(files), n)]
+		for i in range(1, acc):
+			out = str(acc) + "out.txt"
+			inputs = str(i) + "out.txt"
+			rule.write("{0}: {1}\n\tperl getwords {1} > {0}\n".format(out, inputs))
+			acc += 1
 generator()
