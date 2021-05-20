@@ -1,16 +1,40 @@
-#!/usr/bin/env python2
-import sys
+#!/usr/bin/python
 
+import sys
+import os
 
 def combine():
-    args = sys.argv
-    if len(args) == 1:
-        exit()
-    prevContents = ""
-    for i in range(1, len(args) - 1):
-        with open(args[i], 'r') as book:
-            prevContents += book.read() + '\n'
-    with open(args[-1], 'w') as f:
-        f.write(prevContents)
-
+	args  = sys.argv
+	dict = {}
+	author = ""
+	for file in args[1:]:
+		with open(file, "r") as f:
+			lines =  f.readlines()
+		for line in lines:
+			if ":" not in line:
+				author = line.replace("\n", "").replace("\r","")
+			else:
+				lineToList = line.split(": ")
+				key = lineToList[0]
+				count = int(lineToList[1].replace("\n", ""))
+				if author in dict.keys():
+					if key in dict[author].keys():
+						dict[author][key] = dict[author][key] + count
+					else:
+						dict[author][key] = count
+				else:
+					dict[author] = {}
+	print("TOTALWORDS")
+	sortedDict  = sorted(dict["TOTALWORDS"].items(), key = lambda x : x[1], reverse=True)
+	for i in range(10):
+		print("{0}:{1}".format(sortedDict[i][0], sortedDict[i][1])) 
+	for author in dict.keys():
+		sortedDict  = sorted(dict[author].items(), key = lambda x : x[1], reverse=True)
+		if "TOTAL" in author:
+			pass
+		else:
+			print("")
+			print(author)
+			for i in range(5):
+				print("{0}: {1}".format(sortedDict[i][0], sortedDict[i][1]))
 combine()

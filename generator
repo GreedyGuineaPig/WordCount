@@ -2,27 +2,30 @@
 import os
 
 def generator():
-	files = [f for f in os.listdir('./books')]
+	os.system("mkdir merged")
+	os.system("mkdir words")
+	files = ["./books/" + f for f in os.listdir('./books')]
 	n = 10
 	results = [files[i:i + n] for i in range(0, len(files), n)]
 	acc = 1
-	with open("rule.txt", 'w') as rule:
-		# combine (our merge) rule
+	with open("rule.mf", 'w') as rule:
+		# combine  rule
 		for result in results:
-			out = str(acc) + "out.txt"
-			for book in result:
-				book = "./books/" + book
-				print("This is book: " + book)
-			print(result)
+			out = "./merged/" + str(acc) + "out.txt"
 			inputs =  str(result[0:10]).replace("[", "").replace("]","").replace(",", " ").replace("'", "")
-			rule.write("{0}: {1}\n\tpython combine {1} > {0}\n".format(out, inputs))
+			rule.write("{0}: {1}\n\tpython merge {1} > {0}\n".format(out, inputs))
 			acc += 1
 		# getwords rule
-		n = 1
-		results = [files[i:i + n] for i in range(0, len(files), n)]
+		outs = ""
 		for i in range(1, acc):
-			out = str(acc) + "out.txt"
-			inputs = str(i) + "out.txt"
+			out = "./words/" + str(i) + "wOut.txt"
+			inputs = "./merged/" +  str(i) + "out.txt"
 			rule.write("{0}: {1}\n\tperl getwords {1} > {0}\n".format(out, inputs))
-			acc += 1
+			outs += out + " "
+
+		#combine rule
+		out = "result.txt"
+		inputs =  outs
+		rule.write("{0}: {1}\n\tpython combine {1} > {0}\n".format(out, inputs))
+		print("{0}: {1}\n\tpython combine {1} > {0}\n".format(out, "inputs"))
 generator()
